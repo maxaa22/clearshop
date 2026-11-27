@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Чистий Шоп</title>
+<style>
+:root{
+  --ink:#251f2b;--muted:#7a7183;--acc:#ff6a2b;--acc2:#ff3d77;--vio:#8b5cf6;
+  --glass:rgba(255,255,255,.55);--glass2:rgba(255,255,255,.75);--line:rgba(255,255,255,.85);
+  --shadow:0 10px 30px rgba(120,60,140,.12),0 2px 6px rgba(0,0,0,.04);
+  --r:24px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
+html,body{min-height:100%;font-family:system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;color:var(--ink);background:#f7f4f9;overflow-x:hidden}
+body{padding:14px 16px 28px}
+/* кольорові плями під склом */
+.blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(180deg,#f7f4f9,#fdefe8)}
+.blobs i{position:absolute;border-radius:50%;filter:blur(40px);opacity:.55;animation:float 14s ease-in-out infinite alternate}
+.blobs i:nth-child(1){width:260px;height:260px;background:#ffb38a;top:-60px;left:-70px}
+.blobs i:nth-child(2){width:220px;height:220px;background:#ff8fb7;top:180px;right:-80px;animation-delay:-4s}
+.blobs i:nth-child(3){width:260px;height:260px;background:#b9a3ff;bottom:-60px;left:20%;animation-delay:-8s}
+@keyframes float{to{transform:translate(30px,40px) scale(1.12)}}
+
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.9)}
+.page{display:none;animation:in .35s cubic-bezier(.2,.8,.2,1)}
+.page.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+.tap{transition:transform .15s}
+.tap:active{transform:scale(.95)}
+
+/* шапка */
+.top{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 14px}
+.hello{font-size:14px;color:var(--muted)}
+h1{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+h1 span{background:linear-gradient(90deg,var(--acc),var(--acc2),var(--vio));-webkit-background-clip:text;color:transparent}
+h2{font-size:18px;font-weight:750;margin:22px 4px 10px;display:flex;justify-content:space-between;align-items:center}
+h2 small{font-size:13px;color:var(--acc);font-weight:600}
+.shield{padding:8px 12px;border-radius:18px;font-size:12px;font-weight:600;color:#1d8a52;display:flex;gap:6px;align-items:center}
+
+/* пошук */
+.search{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px;border-radius:22px}
+.search input{flex:1;border:0;background:transparent;font-size:16px;color:var(--ink);outline:0;padding:10px 0;min-width:0}
+.search input::placeholder{color:#9a90a3}
+.search button{border:0;border-radius:17px;padding:11px 16px;font-size:15px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 6px 16px rgba(255,90,80,.35)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;padding:8px 14px;border-radius:16px;font-size:13px;white-space:nowrap}
+
+/* герой */
+.hero{margin-top:16px;padding:18px;border-radius:28px;position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(135deg,rgba(255,106,43,.92),rgba(255,61,119,.9) 55%,rgba(139,92,246,.9));
+  box-shadow:0 14px 34px rgba(255,80,100,.3)}
+.hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-40px;top:-60px;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%)}
+.hero b{font-size:20px;display:block}
+.hero p{font-size:13px;opacity:.9;margin-top:4px;max-width:75%}
+.hero .row{display:flex;gap:8px;margin-top:14px;position:relative;z-index:1}
+.hero .row div{flex:1;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:16px;padding:10px;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hero .row div strong{font-size:20px;display:block}
+.hero .row div span{font-size:11px;opacity:.9}
+
+/* сітка категорій */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.cat{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:20px;font-size:11.5px;font-weight:600;text-align:center}
+.cat .e{font-size:26px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,255,255,.4));box-shadow:inset 0 1px 0 #fff,0 4px 10px rgba(0,0,0,.05)}
+
+/* швидкі картки */
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.q{padding:14px;border-radius:22px;display:flex;flex-direction:column;gap:8px}
+.q .e{font-size:22px}
+.q b{font-size:15px}
+.q span{font-size:12px;color:var(--muted)}
+
+/* списки */
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:20px}
+.item .ic{flex:0 0 42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;
+  background:linear-gradient(135deg,#ffe1d2,#ffd3e3)}
+.item .tx{flex:1;min-width:0}
+.item .tx b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .tx span{font-size:12px;color:var(--muted)}
+.item .x{border:0;background:rgba(0,0,0,.05);width:34px;height:34px;border-radius:12px;font-size:16px;color:var(--muted)}
+.empty{text-align:center;padding:36px 20px;border-radius:26px}
+.empty .e{font-size:44px}
+.empty b{display:block;font-size:17px;margin-top:8px}
+.empty p{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* каталог */
+.sec{padding:14px;border-radius:24px;margin-bottom:12px}
+.sec .hd{display:flex;align-items:center;gap:10px;font-weight:750;font-size:16px}
+.sec .hd .e{font-size:22px}
+.sec .chips{padding-top:12px;flex-wrap:wrap}
+.sec .chip{background:rgba(255,255,255,.7);border:1px solid #fff}
+
+/* налаштування */
+.set{border-radius:24px;overflow:hidden}
+.opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.7)}
+.opt:last-child{border-bottom:0}
+.opt .tx{flex:1}
+.opt .tx b{display:block;font-size:15px}
+.opt .tx span{font-size:12px;color:var(--muted)}
+.sw{position:relative;width:52px;height:32px;flex:0 0 52px}
+.sw input{display:none}
+.sw i{position:absolute;inset:0;border-radius:20px;background:rgba(120,110,130,.25);transition:.25s}
+.sw i:after{content:"";position:absolute;width:26px;height:26px;left:3px;top:3px;border-radius:50%;background:#fff;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);transition:.25s cubic-bezier(.3,1.4,.6,1)}
+.sw input:checked+i{background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.sw input:checked+i:after{transform:translateX(20px)}
+.btn{width:100%;border:0;padding:14px;border-radius:18px;font-size:15px;font-weight:700;margin-top:10px;color:var(--ink)}
+.btn.red{color:#d92d4a}
+.about{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,40px);opacity:0;padding:12px 18px;border-radius:18px;
+  font-size:14px;font-weight:600;transition:.3s;pointer-events:none}
+.toast.on{transform:translate(-50%,0);opacity:1}
+</style>
+</head>
+<body>
+<div class="blobs"><i></i><i></i><i></i></div>
+
+<!-- ============ ГОЛОВНА ============ -->
+<section class="page on" id="p-home">
+  <div class="top">
+    <div><div class="hello" id="hello">Привіт 👋</div><h1><span>Чистий</span> Шоп</h1></div>
+    <div class="shield glass">🛡 <span id="shieldN">0</span></div>
+  </div>
+
+  <form class="search glass" id="sform">
+    <span>🔎</span>
+    <input id="q" type="search" placeholder="Що шукаємо сьогодні?" autocomplete="off" enterkeyhint="search">
+    <button type="submit">Знайти</button>
+  </form>
+  <div class="chips" id="recent"></div>
+
+  <div class="hero">
+    <b>Покупки без зайвого шуму</b>
+    <p>Реклама, колеса удачі й нав'язливі вікна прибираються автоматично.</p>
+    <div class="row">
+      <div><strong id="stAds">0</strong><span>трекерів заблоковано</span></div>
+      <div><strong id="stPop">0</strong><span>вікон приховано</span></div>
+    </div>
+  </div>
+
+  <h2>Категорії <small class="tap" onclick="route('catalog')">Усі ›</small></h2>
+  <div class="grid" id="cats"></div>
+
+  <h2>Швидкий доступ</h2>
+  <div class="quick">
+    <div class="q glass tap" onclick="A.cart()"><span class="e">🛒</span><b>Кошик</b><span>Твої товари</span></div>
+    <div class="q glass tap" onclick="A.home()"><span class="e">🏷️</span><b>Магазин</b><span>Головна сайту</span></div>
+    <div class="q glass tap" onclick="route('favs')"><span class="e">💖</span><b>Обране</b><span id="favN">0 товарів</span></div>
+    <div class="q glass tap" onclick="route('history')"><span class="e">🕘</span><b>Історія</b><span id="histN">0 переглядів</span></div>
+  </div>
+
+  <h2 id="lastH" style="display:none">Нещодавно дивився <small class="tap" onclick="route('history')">Усе ›</small></h2>
+  <div class="list" id="lastList"></div>
+</section>
+
+<!-- ============ КАТАЛОГ ============ -->
+<section class="page" id="p-catalog">
+  <div class="top"><div><div class="hello">Обирай розділ</div><h1>Каталог</h1></div></div>
+  <div id="catalog"></div>
+</section>
+
+<!-- ============ ОБРАНЕ ============ -->
+<section class="page" id="p-favs">
+  <div class="top"><div><div class="hello">Збережені товари</div><h1>Обране</h1></div></div>
+  <div class="list" id="favList"></div>
+</section>
+
+<!-- ============ ІСТОРІЯ ============ -->
+<section class="page" id="p-history">
+  <div class="top"><div><div class="hello">Що ти переглядав</div><h1>Історія</h1></div></div>
+  <div class="list" id="histList"></div>
+  <button class="btn glass red tap" id="clrHist" onclick="if(confirmBox('Очистити історію?')){A.clearHistory();render()}">Очистити історію</button>
+</section>
+
+<!-- ============ НАЛАШТУВАННЯ ============ -->
+<section class="page" id="p-settings">
+  <div class="top"><div><div class="hello">Налаштуй під себе</div><h1>Ще</h1></div></div>
+  <div class="set glass">
+    <label class="opt"><div class="tx"><b>Блокувати рекламу</b><span>Трекери й рекламні сервіси не вантажаться</span></div>
+      <span class="sw"><input type="checkbox" data-k="ads"><i></i></span></label>
+    <label class="opt"><div class="tx"><b>Ховати спливаючі вікна</b><span>Купони, колеса удачі, «завантажте додаток»</span></div>
+      <span class="sw"><input type="checkbox" data-k="popups"><i></i></span></label>
+    <label class="opt"><div class="tx"><b>Новий вигляд сайту</b><span>М'які кольори, заокруглення, без рідної панелі</span></div>
+      <span class="sw"><input type="checkbox" data-k="skin"><i></i></span></label>
+  </div>
+  <h2>Дані</h2>
+  <button class="btn glass tap" onclick="A.clearHistory();toast('Історію очищено');render()">🕘 Очистити історію</button>
+  <button class="btn glass tap" onclick="clearRecent()">🔎 Очистити пошукові запити</button>
+  <button class="btn glass red tap" onclick="if(confirmBox('Вийти з акаунта магазину і стерти cookies?')){A.logout();toast('Готово')}">🚪 Вийти з акаунта</button>
+  <div class="about">Чистий Шоп 2.0 · неофіційний клієнт<br>Відкриває сайт temu.com у безпечному WebView</div>
+</section>
+
+<div class="toast glass" id="toast"></div>
+
+<script>
+// міст до Android (або заглушка для перегляду в браузері)
+var A = window.Android || {
+  search:function(q){console.log('search',q)}, openUrl:function(u){console.log(u)}, cart:function(){}, home:function(){},
+  favs:function(){return '[]'}, history:function(){return '[]'}, removeFav:function(){}, removeHistory:function(){},
+  clearHistory:function(){}, logout:function(){}, stats:function(){return '{"ads":0,"popups":0}'},
+  getOpt:function(){return true}, setOpt:function(){}, tab:function(){}
+};
+
+var CATS = [
+  ['📱','Електроніка',['Смартфон аксесуари','Навушники','Павербанк','Смарт годинник','Кабель USB-C','Чохол для телефону']],
+  ['🏠','Дім',['Органайзер','Світлодіодна стрічка','Декор для дому','Штори','Килимок','Зберігання речей']],
+  ['🍳','Кухня',['Кухонне приладдя','Ножі','Форми для випічки','Контейнери для їжі','Термос','Спеції органайзер']],
+  ['👕','Одяг',['Худі','Футболки','Куртки','Джинси','Сукні','Шкарпетки']],
+  ['👟','Взуття',['Кросівки','Капці','Черевики','Сандалі','Устілки','Шнурки']],
+  ['💄','Краса',['Косметика','Догляд за шкірою','Манікюр','Щітки для макіяжу','Аксесуари для волосся','Дзеркало з підсвіткою']],
+  ['🧸','Іграшки',['Конструктор','Настільні ігри','Пазли','Іграшки для малюків','Фігурки','Розвиваючі іграшки']],
+  ['🚗','Авто',['Автоаксесуари','Тримач телефону в авто','Автомобільний органайзер','Авто зарядка','Чохли на сидіння','Автопилосос']],
+  ['⚽','Спорт',['Фітнес','Велоаксесуари','Пляшка для води','Килимок для йоги','Рюкзак','Туризм']],
+  ['🌿','Сад',['Садові інструменти','Насіння','Горщики для квітів','Садове освітлення','Полив','Теплиця']],
+  ['🐾','Тварини',['Іграшки для котів','Лежак для собаки','Повідок','Миски для тварин','Догляд за тваринами','Кігтеточка']],
+  ['✏️','Канцтовари',['Канцелярія','Ручки','Блокноти','Маркери','Шкільний рюкзак','Наліпки']]
+];
+
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function J(s){try{return JSON.parse(s)||[]}catch(e){return []}}
+function confirmBox(t){return window.confirm(t)}
+function toast(t){var e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('on')},1800)}
+
+// ---------- маршрути ----------
+var TABS={home:0,catalog:1,favs:3,history:0,settings:4};
+function route(r){
+  if(!document.getElementById('p-'+r)) r='home';
+  document.querySelectorAll('.page').forEach(function(p){p.classList.toggle('on',p.id==='p-'+r)});
+  window.scrollTo(0,0); render();
+  if(A.tab) A.tab(TABS[r]);
+  window.__route=r;
+}
+window.route=route;
+
+// ---------- пошук ----------
+function recent(){try{return JSON.parse(localStorage.getItem('recent'))||[]}catch(e){return []}}
+function saveRecent(q){var r=recent().filter(function(x){return x!==q});r.unshift(q);try{localStorage.setItem('recent',JSON.stringify(r.slice(0,10)))}catch(e){}}
+function clearRecent(){try{localStorage.removeItem('recent')}catch(e){};render();toast('Запити очищено')}
+function doSearch(q){q=(q||'').trim();if(!q)return;saveRecent(q);A.search(q);setTimeout(render,300)}
+$('#sform').addEventListener('submit',function(e){e.preventDefault();var i=$('#q');doSearch(i.value);i.blur()});
+window.focusSearch=function(){route('home');setTimeout(function(){$('#q').focus()},250)};
+
+// ---------- рендер ----------
+function itemHtml(x,kind){
+  return '<div class="item glass tap" data-u="'+esc(x.u)+'"><div class="ic">'+(kind==='fav'?'💖':'🛍️')+'</div>'+
+    '<div class="tx"><b>'+esc(x.t||'Товар')+'</b><span>'+esc(x.d||'')+'</span></div>'+
+    '<button class="x" data-rm="'+esc(x.u)+'" data-kind="'+kind+'">✕</button></div>';
+}
+function bindList(el){
+  el.querySelectorAll('.item').forEach(function(it){
+    it.onclick=function(e){
+      var rm=e.target.getAttribute('data-rm');
+      if(rm){e.stopPropagation(); if(e.target.getAttribute('data-kind')==='fav')A.removeFav(rm); else A.removeHistory(rm); render(); return;}
+      A.openUrl(it.getAttribute('data-u'));
+    };
+  });
+}
+function empty(e,b,p){return '<div class="empty glass"><div class="e">'+e+'</div><b>'+b+'</b><p>'+p+'</p></div>'}
+
+function render(){
+  var h=new Date().getHours();
+  $('#hello').textContent=(h<6?'Доброї ночі':h<12?'Доброго ранку':h<18?'Добрий день':'Добрий вечір')+' 👋';
+  var st={};try{st=JSON.parse(A.stats())}catch(e){}
+  $('#stAds').textContent=st.ads||0; $('#stPop').textContent=st.popups||0;
+  $('#shieldN').textContent=(st.ads||0)+(st.popups||0);
+
+  $('#recent').innerHTML=recent().map(function(q){return '<span class="chip glass tap" data-q="'+esc(q)+'">🕘 '+esc(q)+'</span>'}).join('');
+  $('#recent').querySelectorAll('.chip').forEach(function(c){c.onclick=function(){doSearch(c.getAttribute('data-q'))}});
+
+  var favs=J(A.favs()), hist=J(A.history());
+  $('#favN').textContent=favs.length+' '+plural(favs.length,['товар','товари','товарів']);
+  $('#histN').textContent=hist.length+' '+plural(hist.length,['перегляд','перегляди','переглядів']);
+
+  $('#lastH').style.display=hist.length?'flex':'none';
+  $('#lastList').innerHTML=hist.slice(0,3).map(function(x){return itemHtml(x,'hist')}).join('');
+  bindList($('#lastList'));
+
+  $('#favList').innerHTML=favs.length?favs.map(function(x){return itemHtml(x,'fav')}).join(''):
+    empty('💖','Поки порожньо','Відкрий товар і натисни сердечко вгорі, щоб зберегти його тут.');
+  bindList($('#favList'));
+
+  $('#histList').innerHTML=hist.length?hist.map(function(x){return itemHtml(x,'hist')}).join(''):
+    empty('🕘','Історія порожня','Тут з\'являться товари, які ти переглядав.');
+  $('#clrHist').style.display=hist.length?'block':'none';
+  bindList($('#histList'));
+
+  document.querySelectorAll('[data-k]').forEach(function(i){i.checked=A.getOpt(i.getAttribute('data-k'))});
+}
+function plural(n,f){var a=n%10,b=n%100;return a===1&&b!==11?f[0]:a>=2&&a<=4&&(b<10||b>=20)?f[1]:f[2]}
+
+// категорії
+$('#cats').innerHTML=CATS.slice(0,8).map(function(c){return '<div class="cat glass tap" data-q="'+esc(c[1])+'"><span class="e">'+c[0]+'</span>'+c[1]+'</div>'}).join('');
+$('#cats').querySelectorAll('.cat').forEach(function(c){c.onclick=function(){doSearch(c.getAttribute('data-q'))}});
+$('#catalog').innerHTML=CATS.map(function(c){
+  return '<div class="sec glass"><div class="hd tap" data-q="'+esc(c[1])+'"><span class="e">'+c[0]+'</span>'+c[1]+'<span style="margin-left:auto;color:var(--acc);font-size:13px">Усе ›</span></div>'+
+    '<div class="chips">'+c[2].map(function(s){return '<span class="chip tap" data-q="'+esc(s)+'">'+esc(s)+'</span>'}).join('')+'</div></div>';
+}).join('');
+$('#catalog').querySelectorAll('[data-q]').forEach(function(c){c.onclick=function(){doSearch(c.getAttribute('data-q'))}});
+
+document.querySelectorAll('[data-k]').forEach(function(i){
+  i.onchange=function(){A.setOpt(i.getAttribute('data-k'),i.checked);toast(i.checked?'Увімкнено':'Вимкнено')};
+});
+window.refresh=render;
+route(location.hash.slice(1)||'home');
+</script>
+</body>
+</html>
